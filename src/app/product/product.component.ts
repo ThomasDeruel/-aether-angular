@@ -13,7 +13,7 @@ import { Benefitcard } from './__components/benefitCard/benefitcard';
   styleUrl: './product.component.css',
 })
 export class ProductComponent implements OnDestroy {
-  readonly id = input<string>();
+  readonly id = input<string | null>();
   private readonly productService = inject(ProductsService);
   private readonly checkoutService = inject(CheckoutService);
 
@@ -21,24 +21,24 @@ export class ProductComponent implements OnDestroy {
 
   constructor() {
     effect(() => {
-      this.productService.productId.set(this.id());
+      this.productService.selectProduct(this.id() ?? null);
     });
   }
 
   ngOnDestroy() {
-    this.productService.productId.set(undefined);
+    this.productService.selectProduct(null);
   }
 
   img = computed(() => this.product.value());
 
-  addToChart() {
+  addToCart() {
     if (!this.product.hasValue()) return;
 
-    this.checkoutService.addProduct(this.product.value()).subscribe({
+    this.checkoutService.addToCart(this.product.value()).subscribe({
       next: () => {
         const product = this.product.value();
         if (product && product.stock > 0) {
-          this.product.set({ ...product, stock: product?.stock - 1 });
+          this.product.value.set({ ...product, stock: product.stock - 1 });
         }
       },
       error: (err) => {

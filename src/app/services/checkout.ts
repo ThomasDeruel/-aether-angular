@@ -21,7 +21,7 @@ export class CheckoutService {
 
   readonly cart = this.cartResource.asReadonly();
 
-  addProduct(product: Product): Observable<Product> {
+  addToCart(product: Product): Observable<Product> {
     return this.http.post<Product>(this.cartUrl, { product }).pipe(tap(() => this.invalidate()));
   }
 
@@ -48,8 +48,8 @@ export class CheckoutService {
   readonly totalPriceWithTva = computed(() => this.totalPrice() * 1.2);
   readonly tvaOnly = computed(() => this.totalPrice() * 0.2);
 
-  removeProductsById(productId: string): Observable<void> {
-    return this.http.delete<void>(`${CART_API_BASE}/cart/${productId}`).pipe(
+  removeFromCart(productId: number): Observable<void> {
+    return this.http.delete<void>(`${this.cartUrl}/${productId}`).pipe(
       tap(() => {
         this.invalidate();
         this.productsService.invalidate();
@@ -57,8 +57,8 @@ export class CheckoutService {
     );
   }
 
-  validateCheckout(): Observable<void> {
-    return this.http.post<void>(`${CART_API_BASE}/checkout`, {}).pipe(
+  submitCheckout(): Observable<void> {
+    return this.http.post<void>(this.checkoutUrl, {}).pipe(
       tap(() => {
         this.invalidate();
         this.productsService.invalidate();

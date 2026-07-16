@@ -1,11 +1,20 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipListboxChange, MatChipsModule } from '@angular/material/chips';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 import { BadgeComponent } from '../badge/badge.component';
 import { ProductsService } from '../services/products';
 
@@ -32,12 +41,24 @@ interface Category {
   styleUrl: './home.component.css',
 })
 export class HomeComponent {
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly productsService = inject(ProductsService);
 
   readonly products = this.productsService.products;
   readonly isLoading = this.productsService.isLoading;
   readonly category = this.productsService.category;
+
+  readonly queryCategory = toSignal(
+    this.route.queryParamMap.pipe(map((params) => params.get('category') ?? '')),
+    { initialValue: '' },
+  );
+
+  constructor() {
+    effect(() => {
+      this.productsService.selectCategory(this.queryCategory());
+    });
+  }
 
   readonly categories = signal<Category[]>([
     { id: '1', name: 'audio' },
@@ -68,6 +89,6 @@ export class HomeComponent {
   }
 
   toggleFavorite(productId: number): void {
-    console.log('toggle', productId);
+    this.productsService.toggleFavorite(productId);
   }
 }

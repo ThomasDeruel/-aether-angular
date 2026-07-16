@@ -1,8 +1,5 @@
 import { httpResource } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs';
+import { computed, Injectable, signal } from '@angular/core';
 import { Product } from './products.model';
 
 const PRODUCTS_API_BASE = 'http://localhost:3010';
@@ -11,35 +8,75 @@ const PRODUCTS_API_BASE = 'http://localhost:3010';
   providedIn: 'root',
 })
 export class ProductsService {
-  private readonly route = inject(ActivatedRoute);
-  readonly productId = signal<string | undefined>(undefined);
-
-  readonly category = toSignal(
-    this.route.queryParamMap.pipe(map((params) => params.get('category') ?? '')),
-    { initialValue: '' },
-  );
+  readonly category = signal('');
+  readonly selectedProductId = signal<string | null>(null);
 
   private readonly productsUrl = computed(
     () => `${PRODUCTS_API_BASE}/products?category=${this.category()}`,
   );
 
   private readonly productUrl = computed<string | undefined>(() =>
-    this.productId() ? `${PRODUCTS_API_BASE}/products/${this.productId()}` : undefined,
+    this.selectedProductId()
+      ? `${PRODUCTS_API_BASE}/products/${this.selectedProductId()}`
+      : undefined,
   );
 
   private readonly productsResource = httpResource<Product[]>(() => this.productsUrl());
-  readonly product = httpResource<Product>(() => this.productUrl());
+  private readonly productResource = httpResource<Product>(() => this.productUrl());
 
   readonly products = computed<Product[]>(() => {
     const current = this.productsResource.value();
     return Array.isArray(current) ? current : [];
   });
 
+  readonly product = this.productResource;
+
   readonly isLoading = computed(
     () => this.productsResource.isLoading() && this.productsResource.value() === undefined,
   );
 
-  invalidate() {
+  readonly productIsLoading = computed(
+    () => this.productResource.isLoading() && this.productResource.value() === undefined,
+  );
+
+  selectCategory(category: string | null): void {
+    this.category.set(category ?? '');
+  }
+
+  selectProduct(productId: string | null): void {
+    this.selectedProductId.set(productId);
+  }
+
+  reloadProducts(): void {
     this.productsResource.reload();
+  }
+
+  reloadProduct(): void {
+    this.productResource.reload();
+  }
+
+  invalidate(): void {
+    this.reloadProducts();
+  }
+
+  toggleFavorite(productId: number): void {
+    const currentProducts = this.productsResource.value();
+    if (!Array.isArray(currentProducts)) {
+      return;
+    }
+
+    this.productsResource.value.set(
+      currentProducts.map((product) =>
+        product.id === productId ? { ...product, isFavorite: !product.isFavorite } : product,
+      ),
+    );
+
+    const selectedProduct = this.productResource.value();
+    if (selectedProduct?.id === productId) {
+      this.productResource.value.set({
+        ...selectedProduct,
+        isFavorite: !selectedProduct.isFavorite,
+      });
+    }
   }
 }

@@ -36,7 +36,7 @@ export class Checkout {
   readonly totalPrice = this.checkoutService.totalPrice;
   readonly totalPriceWithTva = this.checkoutService.totalPriceWithTva;
   readonly tvaOnly = this.checkoutService.tvaOnly;
-  readonly validateCheckout = () => this.checkoutService.validateCheckout();
+  readonly submitCheckout = () => this.checkoutService.submitCheckout();
 
   constructor() {
     effect(() => {
@@ -120,7 +120,7 @@ export class Checkout {
   onSubmit(event: Event) {
     event.preventDefault();
     submit(this.checkoutForm, async () => {
-      this.validateCheckout().subscribe({
+      this.submitCheckout().subscribe({
         next: () => {
           console.log('Commande validée avec succès !');
           this.submit.set(true);

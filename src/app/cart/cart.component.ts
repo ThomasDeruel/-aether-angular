@@ -52,7 +52,7 @@ export class CartComponent {
   }
 
   removeProduct(product: Product): void {
-    this.checkoutService.removeProductsById(product.id.toString()).subscribe({
+    this.checkoutService.removeFromCart(product.id).subscribe({
       error: (error) => {
         console.error('Unable to remove the product from the cart.', error);
       },
