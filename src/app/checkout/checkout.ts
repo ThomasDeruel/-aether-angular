@@ -15,7 +15,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { Router, RouterLink } from '@angular/router';
-import { Checkout as CS } from '../services/checkout';
+import { CheckoutService } from '../services/checkout';
 import { Product } from '../services/products.model';
 
 type PaymentMethod = 'card' | 'livraison';
@@ -27,10 +27,10 @@ type PaymentMethod = 'card' | 'livraison';
   styleUrl: './checkout.css',
 })
 export class Checkout {
-  private checkoutService = inject(CS);
+  private checkoutService = inject(CheckoutService);
   private router = inject(Router);
 
-  readonly data = this.checkoutService.chart;
+  readonly data = this.checkoutService.cart;
   readonly submit = signal(false);
 
   readonly totalPrice = this.checkoutService.totalPrice;
@@ -45,7 +45,8 @@ export class Checkout {
       }
     });
   }
-  uniqueProducts = computed(() => {
+
+  readonly uniqueProducts = computed(() => {
     const seen = new Set<number>();
     return (this.data.value() ?? []).filter((item) => {
       if (seen.has(item.id)) return false;
@@ -53,15 +54,15 @@ export class Checkout {
       return true;
     });
   });
+
   nbProducts(product: Product) {
     return this.data.value()?.filter((p) => p.id === product.id).length ?? 0;
   }
+
   currentPrice(product: Product) {
     if (!product.price) return 0;
     return this.nbProducts(product) * product.price;
   }
-
-  // https://angular.dev/guide/forms/signals/validation#pattern
 
   checkout = signal({
     firstName: 'Unknown',
@@ -76,7 +77,7 @@ export class Checkout {
     cardNumber: '1234567890123456',
     expiration: '01/09',
     cvv: '000',
-  }); // ← plus de "}" en trop juste après
+  });
 
   checkoutForm = form(
     this.checkout,
@@ -118,7 +119,7 @@ export class Checkout {
 
   onSubmit(event: Event) {
     event.preventDefault();
-    submit(this.checkoutForm, async (f) => {
+    submit(this.checkoutForm, async () => {
       this.validateCheckout().subscribe({
         next: () => {
           console.log('Commande validée avec succès !');

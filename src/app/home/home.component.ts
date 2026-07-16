@@ -1,12 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipListboxChange, MatChipsModule } from '@angular/material/chips';
@@ -14,16 +7,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
 import { BadgeComponent } from '../badge/badge.component';
-import { Products } from '../services/products';
-
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  image: string;
-  isFavorite: boolean;
-}
+import { ProductsService } from '../services/products';
 
 interface Category {
   id: string;
@@ -49,18 +33,12 @@ interface Category {
 })
 export class HomeComponent {
   private readonly router = inject(Router);
-  private readonly productsService = inject(Products);
+  private readonly productsService = inject(ProductsService);
 
   readonly products = this.productsService.products;
   readonly isLoading = this.productsService.isLoading;
   readonly category = this.productsService.category;
-  readonly selectedProduct = this.productsService.selectedProduct;
 
-  constructor() {
-    effect(() => {
-      console.log(this.isLoading(), this.products());
-    });
-  }
   readonly categories = signal<Category[]>([
     { id: '1', name: 'audio' },
     { id: '2', name: 'wearable' },
@@ -89,7 +67,7 @@ export class HomeComponent {
     });
   }
 
-  toggleFavorite(productId: string): void {
-    console.log('toggle');
+  toggleFavorite(productId: number): void {
+    console.log('toggle', productId);
   }
 }

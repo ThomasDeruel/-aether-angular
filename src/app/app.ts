@@ -8,7 +8,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { CartComponent } from './cart/cart.component';
-import { Checkout } from './services/checkout';
+import { CheckoutService } from './services/checkout';
 
 @Component({
   selector: 'app-root',
@@ -29,9 +29,9 @@ import { Checkout } from './services/checkout';
   styleUrls: ['./app.css'],
 })
 export class App {
-  private readonly checkoutService = inject(Checkout);
+  private readonly checkoutService = inject(CheckoutService);
   protected readonly title = signal('Aether');
-  protected readonly cart = this.checkoutService.chart;
+  protected readonly cart = this.checkoutService.cart;
 
   readonly numberCarts = computed(() => this.cart.value()?.length ?? 0);
 }

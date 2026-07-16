@@ -5,7 +5,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenav } from '@angular/material/sidenav';
 import { RouterLink } from '@angular/router';
-import { Checkout } from '../services/checkout';
+import { CheckoutService } from '../services/checkout';
 import { Product } from '../services/products.model';
 
 @Component({
@@ -25,10 +25,10 @@ import { Product } from '../services/products.model';
 export class CartComponent {
   readonly id = input();
   readonly drawer = input<MatSidenav>();
-  private readonly checkoutService = inject(Checkout);
+  private readonly checkoutService = inject(CheckoutService);
 
-  readonly nbArticles = computed(() => this.checkoutService.chart.value()?.length ?? 0);
-  readonly data = this.checkoutService.chart;
+  readonly nbArticles = computed(() => this.checkoutService.cart.value()?.length ?? 0);
+  readonly data = this.checkoutService.cart;
 
   readonly uniqueProducts = computed(() => {
     const seen = new Set<number>();

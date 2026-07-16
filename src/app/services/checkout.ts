@@ -1,70 +1,64 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { computed, inject, Injectable } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
-import { filter, firstValueFrom, tap } from 'rxjs';
-import { Products } from './products';
+import { Router, UrlTree } from '@angular/router';
+import { filter, firstValueFrom, Observable, tap } from 'rxjs';
+import { ProductsService } from './products';
 import { type Product } from './products.model';
+
+const CART_API_BASE = 'http://localhost:3010';
 
 @Injectable({
   providedIn: 'root',
 })
-export class Checkout {
-  private readonly router = inject(Router); // ✅ injection context valide
+export class CheckoutService {
+  private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
-  private readonly productsService = inject(Products);
-  private readonly data = httpResource<Product[]>(() => 'http://localhost:3010/cart');
+  private readonly productsService = inject(ProductsService);
+  private readonly cartUrl = `${CART_API_BASE}/cart`;
+  private readonly checkoutUrl = `${CART_API_BASE}/checkout`;
+  private readonly cartResource = httpResource<Product[]>(() => this.cartUrl);
 
-  readonly chart = this.data.asReadonly();
+  readonly cart = this.cartResource.asReadonly();
 
-  addProduct(product: Product) {
-    return this.http
-      .post<Product>('http://localhost:3010/cart', { product: product })
-      .pipe(tap(() => this.invalidate()));
+  addProduct(product: Product): Observable<Product> {
+    return this.http.post<Product>(this.cartUrl, { product }).pipe(tap(() => this.invalidate()));
   }
 
-  async canActivate() {
-    // "Transforme le signal status en flux observable,
-    // ignore-le tant qu'il n'est pas dans un état final (resolved ou error),
-    // et mets en pause le guard jusqu'à ce que ce moment arrive."
+  async canActivate(): Promise<boolean | UrlTree> {
     await firstValueFrom(
-      toObservable(this.data.value).pipe(filter((products) => products !== undefined)),
+      toObservable(this.cartResource.value).pipe(filter((products) => products !== undefined)),
     );
 
-    const validate = (this.data.value()?.length ?? 0) > 0;
-    console.log(this.data);
-    if (validate) {
+    if ((this.cartResource.value()?.length ?? 0) > 0) {
       return true;
     }
-    console.log('HA');
-    return this.router.createUrlTree(['/']); // Angular gère la redirection proprement
+
+    return this.router.createUrlTree(['/']);
   }
 
-  invalidate() {
-    this.data.reload();
+  invalidate(): void {
+    this.cartResource.reload();
   }
 
-  totalPrice = computed(
-    () =>
-      (this.data.value() ?? []).reduce((accumulator, product) => accumulator + product.price, 0) ??
-      0,
+  readonly totalPrice = computed(() =>
+    (this.cartResource.value() ?? []).reduce((total, product) => total + product.price, 0),
   );
 
-  totalPriceWithTva = computed(() => this.totalPrice() * 1.2);
+  readonly totalPriceWithTva = computed(() => this.totalPrice() * 1.2);
+  readonly tvaOnly = computed(() => this.totalPrice() * 0.2);
 
-  tvaOnly = computed(() => this.totalPrice() * 0.2);
-
-  removeProductsById(productId: string) {
-    return this.http.delete(`http://localhost:3010/cart/${productId}`).pipe(
+  removeProductsById(productId: string): Observable<void> {
+    return this.http.delete<void>(`${CART_API_BASE}/cart/${productId}`).pipe(
       tap(() => {
         this.invalidate();
-        this.productsService.product?.reload();
+        this.productsService.invalidate();
       }),
     );
   }
 
-  validateCheckout() {
-    return this.http.post('http://localhost:3010/checkout', {}).pipe(
+  validateCheckout(): Observable<void> {
+    return this.http.post<void>(`${CART_API_BASE}/checkout`, {}).pipe(
       tap(() => {
         this.invalidate();
         this.productsService.invalidate();

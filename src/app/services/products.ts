@@ -5,12 +5,13 @@ import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { Product } from './products.model';
 
+const PRODUCTS_API_BASE = 'http://localhost:3010';
+
 @Injectable({
   providedIn: 'root',
 })
-export class Products {
+export class ProductsService {
   private readonly route = inject(ActivatedRoute);
-  readonly selectedProduct = signal<Product | null>(null);
   readonly productId = signal<string | undefined>(undefined);
 
   readonly category = toSignal(
@@ -18,28 +19,27 @@ export class Products {
     { initialValue: '' },
   );
 
-  private readonly _data = httpResource<Product[]>(
-    () => `http://localhost:3010/products?category=${this.category()}`,
+  private readonly productsUrl = computed(
+    () => `${PRODUCTS_API_BASE}/products?category=${this.category()}`,
   );
 
-  readonly product = httpResource<Product>(() =>
-    this.productId() ? `http://localhost:3010/products/${this.productId()}` : undefined,
+  private readonly productUrl = computed<string | undefined>(() =>
+    this.productId() ? `${PRODUCTS_API_BASE}/products/${this.productId()}` : undefined,
   );
+
+  private readonly productsResource = httpResource<Product[]>(() => this.productsUrl());
+  readonly product = httpResource<Product>(() => this.productUrl());
 
   readonly products = computed<Product[]>(() => {
-    const current = this._data.value();
+    const current = this.productsResource.value();
     return Array.isArray(current) ? current : [];
   });
 
-  readonly isLoading = computed(() => this._data.isLoading() && this._data.value() === undefined);
+  readonly isLoading = computed(
+    () => this.productsResource.isLoading() && this.productsResource.value() === undefined,
+  );
 
   invalidate() {
-    this._data.reload();
+    this.productsResource.reload();
   }
-
-  getProduct(id: string | undefined) {
-    return id ? httpResource<Product>(() => `http://localhost:3010/products/${id}`) : undefined;
-  }
-
-  readonly reload = () => this._data.reload();
 }

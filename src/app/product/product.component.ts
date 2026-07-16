@@ -1,9 +1,9 @@
-import { Component, computed, effect, inject, input, OnDestroy, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, OnDestroy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
-import { Checkout } from '../services/checkout';
-import { Products } from '../services/products';
+import { CheckoutService } from '../services/checkout';
+import { ProductsService } from '../services/products';
 import { Benefitcard } from './__components/benefitCard/benefitcard';
 
 @Component({
@@ -14,17 +14,14 @@ import { Benefitcard } from './__components/benefitCard/benefitcard';
 })
 export class ProductComponent implements OnDestroy {
   readonly id = input<string>();
-  private readonly productService = inject(Products);
-  private readonly checkoutService = inject(Checkout);
+  private readonly productService = inject(ProductsService);
+  private readonly checkoutService = inject(CheckoutService);
 
   readonly product = this.productService.product;
-
-  private readonly selectProduct = this.productService.selectedProduct;
 
   constructor() {
     effect(() => {
       this.productService.productId.set(this.id());
-      console.log(this.id());
     });
   }
 
@@ -32,9 +29,7 @@ export class ProductComponent implements OnDestroy {
     this.productService.productId.set(undefined);
   }
 
-  currentResource = signal(this.product);
-
-  img = computed(() => this.selectProduct() ?? this.product.value());
+  img = computed(() => this.product.value());
 
   addToChart() {
     if (!this.product.hasValue()) return;

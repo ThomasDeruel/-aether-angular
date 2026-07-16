@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { Route } from '@angular/router';
 import { HomeComponent } from '../app/home/home.component';
-import { Checkout } from './services/checkout';
+import { CheckoutService } from './services/checkout';
 
 export const routes: Route[] = [
   { path: '', component: HomeComponent },
@@ -17,6 +17,6 @@ export const routes: Route[] = [
   {
     path: 'checkout',
     loadComponent: () => import('./checkout/checkout').then((c) => c.Checkout),
-    canActivate: [() => inject(Checkout).canActivate()],
+    canActivate: [() => inject(CheckoutService).canActivate()],
   },
 ];
