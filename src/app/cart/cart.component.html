@@ -1,0 +1,92 @@
+<aside class="cart-panel">
+  <div class="cart-header">
+    <div class="cart-title-group">
+      <mat-icon aria-hidden="true">shopping_bag_outlined</mat-icon>
+      <h2>Votre panier</h2>
+    </div>
+
+    <div class="cart-meta">
+      <p>{{ nbArticles() }} article{{ nbArticles() > 1 ? 's' : '' }}</p>
+      <button (click)="drawer()?.close()" matIconButton aria-label="fermer le panier">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <mat-divider />
+
+  <div class="cart-body">
+    @if (data.hasValue() && uniqueProducts().length) {
+      <div class="cart-products">
+        @for (product of uniqueProducts(); track product.id) {
+          <div class="cart-product">
+            <img
+              [ngSrc]="product.image"
+              [alt]="product.name"
+              class="cart-product-image"
+              width="72"
+              height="72"
+            />
+
+            <div class="cart-product-content">
+              <div class="cart-product-info">
+                <p class="cart-product-category">{{ product.categories[0] || 'Produit' }}</p>
+                <h3>{{ product.name }}</h3>
+              </div>
+
+              <div class="cart-product-meta">
+                <span>Qté : {{ nbProducts(product) }}</span>
+                <strong>{{ currentPrice(product) | currency: 'EUR' }}</strong>
+              </div>
+            </div>
+
+            <button
+              matIconButton
+              type="button"
+              aria-label="retirer le produit du panier"
+              (click)="removeProduct(product)"
+              class="cart-remove"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="cart-footer">
+        <dl class="cart-summary">
+          <dt>Sous-total HT</dt>
+          <dd>{{ totalPrice() | currency: 'EUR' }}</dd>
+
+          <dt>TVA (20%)</dt>
+          <dd>{{ tvaOnly() | currency: 'EUR' }}</dd>
+
+          <dt>Livraison</dt>
+          <dd class="delivery">Offerte</dd>
+
+          <dt class="total">Total TTC</dt>
+          <dd class="price">{{ totalPriceWithTva() | currency: 'EUR' }}</dd>
+        </dl>
+
+        <a
+          class="checkout-link"
+          routerLink="/checkout"
+          (click)="drawer()?.close()"
+          matButton="filled"
+        >
+          Passer commande
+        </a>
+        <button class="secondary-action" matButton="text" (click)="drawer()?.close()">
+          Continuer mes achats
+        </button>
+      </div>
+    } @else {
+      <div class="cart-empty">
+        <mat-icon aria-hidden="true">local_mall_outlined</mat-icon>
+        <h3>Votre panier est vide</h3>
+        <p>Ajoutez vos produits préférés pour commencer.</p>
+        <button matButton="filled" (click)="drawer()?.close()">Continuer mes achats</button>
+      </div>
+    }
+  </div>
+</aside>

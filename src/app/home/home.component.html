@@ -1,0 +1,73 @@
+<h2 class="page-title">Collection</h2>
+
+<section class="filter-section" aria-labelledby="filter-heading">
+  <h3 id="filter-heading" class="section-title">Filtrer par catégorie</h3>
+  <mat-chip-listbox aria-labelledby="filter-heading" (change)="onCategoryChange($event)">
+    @for (category of categories(); track category.id) {
+      <mat-chip-option [id]="category.id" [selected]="selectedCategories().includes(category.name)">
+        {{ category.name }}
+      </mat-chip-option>
+    }
+  </mat-chip-listbox>
+</section>
+
+<section class="products-section" aria-labelledby="products-heading">
+  <h2 id="products-heading" class="visually-hidden">Produits disponibles</h2>
+
+  @if (!isLoading()) {
+    <div class="products-container">
+      @for (product of filteredProducts(); track product.id) {
+        <article class="card-container" [class.out]="product.stock === 0">
+          <mat-card appearance="outlined" class="card">
+            <mat-grid-list cols="12" rowHeight="1:2">
+              <mat-grid-tile class="notification" [colspan]="6">
+                <app-badge type="hot" />
+              </mat-grid-tile>
+              <mat-grid-tile class="fav" [colspan]="6">
+                <button
+                  matIconButton
+                  type="button"
+                  (click)="toggleFavorite(product.id)"
+                  [attr.aria-label]="
+                    product.isFavorite
+                      ? 'Retirer des favoris ' + product.name
+                      : 'Ajouter aux favoris ' + product.name
+                  "
+                >
+                  <mat-icon>
+                    {{ product.isFavorite ? 'favorite' : 'favorite_outlined' }}
+                  </mat-icon>
+                </button>
+              </mat-grid-tile>
+            </mat-grid-list>
+
+            <img
+              [ngSrc]="product.image"
+              [alt]="product.name"
+              class="card-image"
+              priority
+              fill
+              [style.view-transition-name]="'product-' + product.id"
+            />
+            <a [routerLink]="['/products', product.id]" class="card-link">Voir le produit</a>
+          </mat-card>
+
+          <div class="details-container">
+            <p class="type">{{ product.categories.join(', ') }}</p>
+            <p class="name">{{ product.name }}</p>
+            <p class="price">
+              <span class="visually-hidden">Prix :</span>
+              ${{ product.price }}
+            </p>
+          </div>
+        </article>
+      }
+    </div>
+
+    @if (filteredProducts().length === 0) {
+      <p class="no-products">Aucun produit ne correspond à vos critères.</p>
+    }
+  } @else {
+    <p class="no-products">Chargement des produits…</p>
+  }
+</section>

@@ -1,0 +1,263 @@
+@if (!submit()) {
+  <h1>Finaliser la commande</h1>
+  <p>Encore quelques étapes avant de recevoir vos produits.</p>
+
+  <div class="checkout-container">
+    <form id="checkout-form" (submit)="onSubmit($event)" novalidate>
+      <fieldset>
+        <legend data-index="1">Coordonnées</legend>
+        <div class="fieldset-container">
+          <div class="fieldset-item">
+            <label for="email">E-mail<span class="required" aria-hidden="true">*</span></label>
+            <input
+              type="email"
+              id="email"
+              autocomplete="email"
+              [formField]="checkoutForm.email"
+              [ariaInvalid]="checkoutForm.email().invalid() && checkoutForm.email().touched()"
+            />
+            @if (checkoutForm.email().touched() && checkoutForm.email().invalid()) {
+              @for (error of checkoutForm.email().errorSummary(); track error.message) {
+                <span role="alert" class="error-message">{{ error.message }}</span>
+              }
+            }
+          </div>
+
+          <div class="grid fieldset-item">
+            <label for="firstname">Prénom<span class="required" aria-hidden="true">*</span></label>
+            <input
+              type="text"
+              id="firstname"
+              autocomplete="given-name"
+              [formField]="checkoutForm.firstName"
+              [ariaInvalid]="
+                checkoutForm.firstName().invalid() && checkoutForm.firstName().touched()
+              "
+            />
+            @if (checkoutForm.firstName().touched() && checkoutForm.firstName().invalid()) {
+              <span role="alert" class="error-message">Veuillez entrer un prénom valide.</span>
+            }
+
+            <label for="lastname">Nom<span class="required" aria-hidden="true">*</span></label>
+            <input
+              type="text"
+              id="lastname"
+              autocomplete="family-name"
+              [formField]="checkoutForm.lastName"
+              [ariaInvalid]="checkoutForm.lastName().invalid() && checkoutForm.lastName().touched()"
+            />
+            @if (checkoutForm.lastName().touched() && checkoutForm.lastName().invalid()) {
+              <span role="alert" class="error-message">Veuillez entrer un nom valide.</span>
+            }
+          </div>
+
+          <div class="fieldset-item">
+            <label for="phone">Téléphone<span class="required" aria-hidden="true">*</span></label>
+            <input
+              type="tel"
+              id="phone"
+              autocomplete="tel"
+              placeholder="06 12 34 56 78"
+              [formField]="checkoutForm.phone"
+              [ariaInvalid]="checkoutForm.phone().invalid() && checkoutForm.phone().touched()"
+            />
+            @if (checkoutForm.phone().touched() && checkoutForm.phone().invalid()) {
+              <span role="alert" class="error-message">
+                Veuillez entrer un numéro de téléphone valide.
+              </span>
+            }
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend data-index="2">Adresse de livraison</legend>
+
+        <div class="fieldset-item">
+          <label for="address">Adresse<span class="required" aria-hidden="true">*</span></label>
+          <input
+            type="text"
+            id="address"
+            autocomplete="street-address"
+            [formField]="checkoutForm.address"
+            [ariaInvalid]="checkoutForm.address().invalid() && checkoutForm.address().touched()"
+          />
+          @if (checkoutForm.address().touched() && checkoutForm.address().invalid()) {
+            <span role="alert" class="error-message">Veuillez entrer une adresse valide.</span>
+          }
+        </div>
+
+        <div class="grid fieldset-item">
+          <label for="zip">Code postal<span class="required" aria-hidden="true">*</span></label>
+          <input
+            type="text"
+            id="zip"
+            autocomplete="postal-code"
+            inputmode="numeric"
+            [formField]="checkoutForm.zip"
+            [ariaInvalid]="checkoutForm.zip().invalid() && checkoutForm.zip().touched()"
+          />
+          @if (checkoutForm.zip().touched() && checkoutForm.zip().invalid()) {
+            <span role="alert" class="error-message">Veuillez entrer un code postal valide.</span>
+          }
+
+          <label for="city">Ville<span class="required" aria-hidden="true">*</span></label>
+          <input
+            type="text"
+            id="city"
+            autocomplete="address-level2"
+            [formField]="checkoutForm.city"
+            [ariaInvalid]="checkoutForm.city().invalid() && checkoutForm.city().touched()"
+          />
+          @if (checkoutForm.city().touched() && checkoutForm.city().invalid()) {
+            <span role="alert" class="error-message">Veuillez entrer une ville valide.</span>
+          }
+        </div>
+        <div class="fieldset-item">
+          <label for="country">Pays<span class="required" aria-hidden="true">*</span></label>
+          <input
+            type="text"
+            id="country"
+            autocomplete="country-name"
+            [formField]="checkoutForm.country"
+            [ariaInvalid]="checkoutForm.country().invalid() && checkoutForm.country().touched()"
+          />
+          @if (checkoutForm.country().touched() && checkoutForm.country().invalid()) {
+            <span role="alert" class="error-message">Veuillez entrer un pays valide.</span>
+          }
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend data-index="3">Paiement</legend>
+
+        <div class="fieldset-item" role="radiogroup" aria-labelledby="payment-method-label">
+          <span id="payment-method-label" class="visually-hidden">Mode de paiement</span>
+
+          <input type="radio" id="card" value="card" [formField]="checkoutForm.paymentMethod" />
+          <label for="card">Carte bancaire</label>
+
+          <input
+            type="radio"
+            id="livraison"
+            value="livraison"
+            [formField]="checkoutForm.paymentMethod"
+          />
+          <label for="livraison">Paiement à la livraison</label>
+        </div>
+
+        @if (checkoutForm.paymentMethod().value() === 'card') {
+          <div class="fieldset-item">
+            <label for="card-number"
+              >Numéro de carte<span class="required" aria-hidden="true">*</span></label
+            >
+            <input
+              type="text"
+              id="card-number"
+              autocomplete="cc-number"
+              inputmode="numeric"
+              [formField]="checkoutForm.cardNumber"
+              [ariaInvalid]="
+                checkoutForm.cardNumber().invalid() && checkoutForm.cardNumber().touched()
+              "
+            />
+            @if (checkoutForm.cardNumber().touched() && checkoutForm.cardNumber().invalid()) {
+              <span role="alert" class="error-message">
+                Veuillez entrer un numéro de carte valide.
+              </span>
+            }
+          </div>
+
+          <div class="grid fieldset-item">
+            <label for="expiration">
+              Expiration
+              <span class="required" aria-hidden="true">*</span>
+            </label>
+            <input
+              type="text"
+              id="expiration"
+              autocomplete="cc-exp"
+              placeholder="MM/AA"
+              [formField]="checkoutForm.expiration"
+              [ariaInvalid]="
+                checkoutForm.expiration().invalid() && checkoutForm.expiration().touched()
+              "
+            />
+            @if (checkoutForm.expiration().touched() && checkoutForm.expiration().invalid()) {
+              <span role="alert" class="error-message">Date d'expiration invalide.</span>
+            }
+
+            <label for="cvv">CVC<span class="required" aria-hidden="true">*</span></label>
+            <input
+              type="text"
+              id="cvv"
+              autocomplete="cc-csc"
+              inputmode="numeric"
+              [formField]="checkoutForm.cvv"
+              [ariaInvalid]="checkoutForm.cvv().invalid() && checkoutForm.cvv().touched()"
+            />
+            @if (checkoutForm.cvv().touched() && checkoutForm.cvv().invalid()) {
+              <span role="alert" class="error-message">CVC invalide.</span>
+            }
+          </div>
+        }
+      </fieldset>
+    </form>
+
+    <aside>
+      <h2 id="recap-title">Récapitulatif</h2>
+      <mat-divider />
+
+      <div>
+        @if (data.hasValue() && uniqueProducts().length) {
+          <ul>
+            @for (product of uniqueProducts(); track product.id) {
+              <li>
+                <img [src]="product.image" alt="" />
+                <div>
+                  <h3>{{ product.name }}</h3>
+                  <p>Accessoire</p>
+                </div>
+                <p>{{ currentPrice(product) | currency: 'EUR' }}</p>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+      <mat-divider />
+      <div>
+        <dl>
+          <dt>Sous-total HT</dt>
+          <dd>{{ totalPrice() | currency: 'EUR' }}</dd>
+
+          <dt>TVA (20%)</dt>
+          <dd>{{ tvaOnly() | currency: 'EUR' }}</dd>
+
+          <dt>Livraison</dt>
+          <dd class="delivery">Offerte</dd>
+
+          <mat-divider />
+
+          <dt class="total">Total TTC</dt>
+          <dd class="price">{{ totalPriceWithTva() | currency: 'EUR' }}</dd>
+        </dl>
+      </div>
+
+      <button class="checkout" matButton="filled" type="submit" form="checkout-form">
+        @if (checkoutForm().submitting()) {
+          Envoi...
+        } @else {
+          Valider la commande
+        }
+      </button>
+    </aside>
+  </div>
+} @else {
+  <div class="submit-container">
+    <div>
+      <h1>Merci pour votre commande !</h1>
+      <p>Votre commande a bien été prise en compte.</p>
+      <a routerLink="/" matButton="filled">Retour à l'accueil</a>
+    </div>
+  </div>
+}

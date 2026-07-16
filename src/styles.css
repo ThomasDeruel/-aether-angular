@@ -1,1 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
+.mat-mdc-form-field.toolbar-search .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}

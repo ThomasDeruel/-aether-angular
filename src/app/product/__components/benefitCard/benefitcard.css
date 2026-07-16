@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  padding: calc(16 * var(--px));
+  background-color: var(--mat-sys-secondary-container);
+  border-radius: calc(16 * var(--px));
+  align-items: center;
+  > * {
+    margin: 0;
+  }
+
+  p:first-of-type {
+    margin: 8px 0 0 0 !important;
+  }
+  .detail {
+    font: var(--mat-sys-body-small);
+    font-size: var(--mat-sys-label-small-size);
+    letter-spacing: var(--mat-sys-body-small-tracking);
+    color: var(--mat-sys-secondary);
+  }
+}

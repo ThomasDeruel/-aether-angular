@@ -1,0 +1,53 @@
+<section>
+  <div class="product-img">
+    <img
+      [src]="img()?.image"
+      [alt]="img()?.name"
+      class="card-image"
+      priority
+      fill
+      [style.view-transition-name]="'product-' + img()?.id"
+    />
+  </div>
+
+  <article>
+    @if (product.hasValue()) {
+      @let p = product.value();
+      <p class="type">{{ p.categories.join(', ') }}</p>
+      <h1 class="name">{{ p.name }}</h1>
+
+      <p class="price"><span class="visually-hidden">price</span>{{ p.price }}$</p>
+
+      <p class="description">
+        Casque sans fil haut de gamme avec réduction de bruit active, autonomie de 40 heures et son
+        spatial immersif. Conçu pour les audiophiles et les voyageurs.
+      </p>
+      <ul>
+        <li benefitcard icon="airport_shuttle"></li>
+        <li benefitcard icon="autorenew"></li>
+        <li benefitcard icon="verified_user"></li>
+      </ul>
+      <mat-grid-list rows="1" cols="3" rowHeight="56px" gutterSize="1rem">
+        <mat-grid-tile [colspan]="2">
+          <button
+            [disabled]="product.value().stock <= 0"
+            (click)="addToChart()"
+            class="checkout-btn"
+            matButton
+            matButton="filled"
+          >
+            <mat-icon>add_2</mat-icon>
+            Ajouter à ce panier
+          </button>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1">
+          <button class="fav-btn" matButton matButton="filled">
+            <mat-icon>favorite_outlined</mat-icon>
+            J'aime
+          </button>
+        </mat-grid-tile>
+      </mat-grid-list>
+      <p>Paiement sécurisé · Stock disponible · Expédition sous 24h</p>
+    }
+  </article>
+</section>

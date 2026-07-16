@@ -1,0 +1,90 @@
+@use '@angular/material' as mat;
+
+section {
+  overflow: hidden;
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(2, 1fr);
+    .product-img,
+    article {
+      padding: 0;
+    }
+    padding: 0;
+  }
+
+  grid-template-columns: repeat(1, 1fr);
+  display: grid;
+  max-width: 1280px;
+  margin: auto;
+  width: 100%;
+  gap: calc(var(--spacing) * 2);
+
+  article,
+  .product-img {
+    padding: 0 24px;
+  }
+  .product-img {
+    width: clamp(100px, 90%, 700px);
+    margin: 0 auto;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  img {
+    transition: transform 200ms ease;
+    border-radius: 42px;
+    min-width: 0;
+    width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+}
+
+h1 {
+  font-size: var(--mat-sys-display-medium-size);
+}
+p.type {
+  font: var(--mat-sys-body-large);
+  letter-spacing: var(--mat-sys-body-large-tracking);
+  color: var(--mat-sys-secondary);
+  text-transform: uppercase;
+}
+
+p.price {
+  font: var(--mat-sys-headline-medium);
+  letter-spacing: var(--mat-sys-headline-medium-tracking);
+  font-weight: 900;
+}
+
+p.description {
+  margin: 24px 0 0 0;
+  font: var(--mat-sys-body-large);
+  font-weight: 400;
+  color: var(--mat-sys-primary);
+}
+
+ul {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 0;
+}
+
+button.fav-btn.mdc-button {
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-inverse-surface);
+  box-shadow: var(--mat-sys-level1);
+}
+
+mat-grid-list,
+ul {
+  margin: 32px 0 0 0;
+}
+mat-grid-list .mat-grid-tile {
+  overflow: visible;
+}
+mat-grid-list button {
+  width: stretch;
+  height: stretch;
+}
